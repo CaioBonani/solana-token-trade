@@ -1,19 +1,20 @@
+
 export let pvk: string;
 export let pbk: string;
 export let token: string;
 
-function Addresses() {
+function Enderecos() {
 
     function pegarPvtKey() {
         //pegar valor do input
         const pvtKey = (document.getElementById("pvtKey") as HTMLInputElement).value;
-        alert(pvtKey);
+        // alert(pvtKey);
         pvk = pvtKey;
     }
     function pegarPubkey() {
         //pegar valor do input
         const pubKey = (document.getElementById("pubKey") as HTMLInputElement).value;
-        alert(pubKey);
+        // alert(pubKey);
         pbk = pubKey;
         return pubKey;
     }
@@ -21,7 +22,7 @@ function Addresses() {
     function pegarToken() {
         //pegar valor do input
         const tokenKey = (document.getElementById("tokenKey") as HTMLInputElement).value;
-        alert(tokenKey);
+        // alert(tokenKey);
         token = tokenKey;
     }
 
@@ -32,7 +33,9 @@ function Addresses() {
     }
 
     return (
+
         <div>
+
             <table>
                     <tr>
                         <td>Private Key</td>
@@ -59,9 +62,7 @@ function Addresses() {
                         <button onClick={handleClick}>Enviar</button>
                     </tr>
                 </table>
-        </div>  
-
-
+        </div> 
     );
 }
-export default Addresses;
+export default Enderecos;
