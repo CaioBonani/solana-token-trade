@@ -31,6 +31,7 @@ import bs58 from 'bs58';
 
 import ReactDOM from 'react-dom';
 
+import React from 'react';
 
 // Special setup to add a Buffer class, because it's missing
 window.Buffer = window.Buffer || require("buffer").Buffer;
@@ -39,47 +40,44 @@ function MintToken() {
 
     const connection = new Connection(clusterApiUrl('testnet'), 'confirmed');
 
+    const [pvtKey, setPvtKey] = React.useState('');
+    const [pubKey, setPubKey] = React.useState('');
+    const [tokenPubKey, setTokenKey] = React.useState('');
+
     //const bs58 = require('bs58');
-    const pvtKey = '5riZXsGzmHMbeh9eCww3xJhap2NxvjM5t2Lfgk97ShLw7zm217c9NnJKcStUtpsoxgvFsf4ggaKQ42yKkWkjJKh' //carteira 1
-    const pvtKeyDecoded = bs58.decode(pvtKey);
-    const uInt8ArrayFromPvtKey = new Uint8Array(pvtKeyDecoded.buffer, pvtKeyDecoded.byteOffset, pvtKeyDecoded.byteLength / Uint8Array.BYTES_PER_ELEMENT);
-    const fromWallet = Keypair.fromSecretKey(uInt8ArrayFromPvtKey);
+    // const pvtKey = '5riZXsGzmHMbeh9eCww3xJhap2NxvjM5t2Lfgk97ShLw7zm217c9NnJKcStUtpsoxgvFsf4ggaKQ42yKkWkjJKh4' //carteira 1
+    // const pvtKeyDecoded = bs58.decode(pvtKey);
+    // const uInt8ArrayFromPvtKey = new Uint8Array(pvtKeyDecoded.buffer, pvtKeyDecoded.byteOffset, pvtKeyDecoded.byteLength / Uint8Array.BYTES_PER_ELEMENT);
+    // const fromWallet = Keypair.fromSecretKey(uInt8ArrayFromPvtKey);
 
     // Public Key to your Phantom Wallet
-    const pubKey = 'w2Z5rPAARvW8uF2mMtNeCQX1LDqTYq5CKf1hT6WdZ1P' //carteira 2
-    const toWallet = new PublicKey(pubKey);
+    // const pubKey = 'w2Z5rPAARvW8uF2mMtNeCQX1LDqTYq5CKf1hT6WdZ1P' //carteira 2
+    // const toWallet = new PublicKey(pubKey);
 
     let fromTokenAccount: Account;
     let mint: PublicKey;
 
-    const tokenPubKey = '8tTF9ieU4rDHoprhV6Qhnm9xyogPuELL5F99MqGkDkh1';
-    let tokenQueSeraTransferido: PublicKey;
-    tokenQueSeraTransferido = new PublicKey(tokenPubKey); //endereco do token que sera transferido, esse token foi criado pelo CLI
-
-    let pvk: string;
-    let pbk: string;
-    let token: string;
-
+    // const tokenPubKey = '8tTF9ieU4rDHoprhV6Qhnm9xyogPuELL5F99MqGkDkh1';
+    // const tokenQueSeraTransferido = new PublicKey(tokenPubKey); //endereco do token que sera transferido, esse token foi criado pelo CLI
 
     function pegarPvtKey() {
         //pegar valor do input
-        const pvtKey = (document.getElementById("pvtKey") as HTMLInputElement).value;
+        const pvk = (document.getElementById("pvtKey") as HTMLInputElement).value;
         // alert(pvtKey);
-        pvk = pvtKey;
+        setPvtKey(pvk);
     }
     function pegarPubkey() {
         //pegar valor do input
-        const pubKey = (document.getElementById("pubKey") as HTMLInputElement).value;
+        const pbk = (document.getElementById("pubKey") as HTMLInputElement).value;
         // alert(pubKey);
-        pbk = pubKey;
-        return pubKey;
+        setPubKey(pbk);
     }
 
     function pegarToken() {
         //pegar valor do input
-        const tokenKey = (document.getElementById("tokenKey") as HTMLInputElement).value;
+        const token = (document.getElementById("tokenKey") as HTMLInputElement).value;
         // alert(tokenKey);
-        token = tokenKey;
+        setTokenKey(token);
     }
 
     function handleClick() {
@@ -91,12 +89,24 @@ function MintToken() {
 
     async function createToken() {
 
-        console.log(pbk);
-        console.log(pvk);
-        console.log(token);
+        console.log('pvtKey: ' + pvtKey);
+        console.log('tokenPubKey: ' + tokenPubKey);
 
-        const fromAirdropSignature = await connection.requestAirdrop(fromWallet.publicKey, LAMPORTS_PER_SOL);
-        await connection.confirmTransaction(fromAirdropSignature);
+        const pvtKeyDecoded = bs58.decode(pvtKey);
+        const uInt8ArrayFromPvtKey = new Uint8Array(pvtKeyDecoded.buffer, pvtKeyDecoded.byteOffset, pvtKeyDecoded.byteLength / Uint8Array.BYTES_PER_ELEMENT);
+        const fromWallet = Keypair.fromSecretKey(uInt8ArrayFromPvtKey);
+
+        const tokenQueSeraTransferido = new PublicKey(tokenPubKey);
+
+        // const toWallet = new PublicKey(pubKey);
+
+
+        // console.log(pbk);
+        // console.log(pvk);
+        // console.log(token);
+
+        // const fromAirdropSignature = await connection.requestAirdrop(fromWallet.publicKey, LAMPORTS_PER_SOL);
+        // await connection.confirmTransaction(fromAirdropSignature);
 
         // Create new token mint
         // mint = await createMint(
@@ -108,9 +118,9 @@ function MintToken() {
         //     );
         mint = tokenQueSeraTransferido;
 
-        console.log(`Create token: ${mint.toBase58()}`);
+        console.log(`Token: ${mint.toBase58()}`);
 
-        console.log('keypair: ' + fromWallet.publicKey.toBase58());
+        console.log('Carteira que possuí o token: ' + fromWallet.publicKey.toBase58());
 
         // Get the token account of the fromWallet address, and if it does not exist, create it
         fromTokenAccount = await getOrCreateAssociatedTokenAccount(
@@ -131,10 +141,16 @@ function MintToken() {
         //     );
         // }
 
-        console.log(`Create Token Account: ${fromTokenAccount.address.toBase58()}`);
+        console.log(`Token Account: ${fromTokenAccount.address.toBase58()}`);
     }
 
     async function mintToken() {
+
+        const pvtKeyDecoded = bs58.decode(pvtKey);
+        const uInt8ArrayFromPvtKey = new Uint8Array(pvtKeyDecoded.buffer, pvtKeyDecoded.byteOffset, pvtKeyDecoded.byteLength / Uint8Array.BYTES_PER_ELEMENT);
+        const fromWallet = Keypair.fromSecretKey(uInt8ArrayFromPvtKey);
+
+
         // Mint 1 new token to the "fromTokenAccount" account we just created
         const signature = await mintTo(
             connection,
@@ -158,6 +174,14 @@ function MintToken() {
     }
 
     async function sendToken() {
+
+        const pvtKeyDecoded = bs58.decode(pvtKey);
+        const uInt8ArrayFromPvtKey = new Uint8Array(pvtKeyDecoded.buffer, pvtKeyDecoded.byteOffset, pvtKeyDecoded.byteLength / Uint8Array.BYTES_PER_ELEMENT);
+        const fromWallet = Keypair.fromSecretKey(uInt8ArrayFromPvtKey);
+
+        const toWallet = new PublicKey(pubKey);
+        
+
         // Get the token account of the toWallet address, and if it does not exist, create it
         const toTokenAccount = await getOrCreateAssociatedTokenAccount(connection, fromWallet, mint, toWallet);
         console.log(`toTokenAccount ${toTokenAccount.address}`);
