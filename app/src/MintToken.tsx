@@ -19,16 +19,6 @@ import {
 
 import bs58 from 'bs58';
 
-// import Enderecos from './Enderecos';
-
-// import pbk from './Enderecos';
-// import pvk from './Enderecos';
-// import token from './Enderecos';
-
-// import pegarPubkey from './Enderecos';
-// import pegarPvtKey from './Enderecos';
-// import pegarToken from './Enderecos';
-
 import ReactDOM from 'react-dom';
 
 import React from 'react';
