@@ -3,6 +3,7 @@ members = [
     "programs/*"
 ]
 
+
 [profile.release]
 overflow-checks = true
 lto = "fat"
