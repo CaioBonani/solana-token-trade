@@ -20,20 +20,21 @@ import {
 import bs58 from 'bs58';
 import ReactDOM from 'react-dom';
 import React from 'react';
+
 import './MintToken.css';
 
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
 function MintToken() {
-
+    
     const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
     const [pvtKey, setPvtKey] = React.useState('');
     const [pubKey, setPubKey] = React.useState('');
     const [tokenPubKey, setTokenKey] = React.useState('');
-
+    
     let fromTokenAccount: Account;
     let mint: PublicKey;
-
+    
     function pegarPvtKey() {
         //pegar valor do input
         const pvk = (document.getElementById("pvtKey") as HTMLInputElement).value;
@@ -45,16 +46,63 @@ function MintToken() {
         const pbk = (document.getElementById("pubKey") as HTMLInputElement).value;
         setPubKey(pbk);
         (document.getElementById("pubKey") as HTMLInputElement).value = "";
-
+        
     }
-
+    
     function pegarToken() {
         //pegar valor do input
         const token = (document.getElementById("tokenKey") as HTMLInputElement).value;
         setTokenKey(token);
         (document.getElementById("tokenKey") as HTMLInputElement).value = "";
-
+        
     }
+    
+    async function testeApi() {
+        
+        const amount = 1000000000;
+        
+        const pvtKeyDecoded = bs58.decode("3hy5sUta8NgU6M8K2kjSjCY48b8Wwd66rpJG2JZ1qhyPLGXt3R6cNEEZz9df666oLPJMKZnUxT5BkbVmXsDEJ3DD");
+        const uInt8ArrayFromPvtKey = new Uint8Array(pvtKeyDecoded.buffer, pvtKeyDecoded.byteOffset, pvtKeyDecoded.byteLength / Uint8Array.BYTES_PER_ELEMENT);
+        const fromWallet = Keypair.fromSecretKey(uInt8ArrayFromPvtKey);
+
+        let from = await getOrCreateAssociatedTokenAccount(
+            connection,
+            fromWallet,
+            new PublicKey("GUuXJ5mh8MqoAEsayC1okx71L9HjP2VGdspJZ1BqHvLv"),
+            fromWallet.publicKey
+        );
+
+        console.log('Token Account da carteira que está enviando: ' + from.address.toBase58());
+
+        let to = await getOrCreateAssociatedTokenAccount(
+            connection,
+            fromWallet,
+            new PublicKey("GUuXJ5mh8MqoAEsayC1okx71L9HjP2VGdspJZ1BqHvLv"),
+            new PublicKey("3LgXWHn9ZHtv7jgUk4Ei8JF35qonMjKkhr6VhTZgy5rK")
+        );
+
+
+
+        let from_a= from.address.toBase58();
+        let to_a= to.address.toBase58();
+
+        console.log('Token Account da carteira que vai receber: ' + to.address.toBase58());
+
+        fetch("http://localhost/8080", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({from_a, to_a, amount}),
+
+        }).then(response => {
+            console.log("Success:");
+
+        }).catch((error) => {
+            console.error("Error:", error);
+        });
+    }
+
 
     function handleClick() {
         pegarPvtKey();
@@ -125,6 +173,9 @@ function MintToken() {
         console.log(`Transferência realizada com a assinatura: ${signature}`);
     }
 
+
+    
+
     return (
         
         <div>
@@ -151,6 +202,7 @@ function MintToken() {
                 <button onClick={GetTokenAccount}>Get Token Account</button>
                 <button onClick={checkBalance}>Check balance</button>
                 <button onClick={sendToken}>Send token</button>
+                <button onClick={testeApi}>Teste API</button>
                 <br/>
                 <br/>
             </div>
