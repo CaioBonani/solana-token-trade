@@ -81,8 +81,6 @@ function MintToken() {
             new PublicKey("3LgXWHn9ZHtv7jgUk4Ei8JF35qonMjKkhr6VhTZgy5rK")
         );
 
-
-
         let from_a= from.address.toBase58();
         let to_a= to.address.toBase58();
 
