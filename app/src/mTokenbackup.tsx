@@ -26,51 +26,41 @@ import './MintToken.css';
 window.Buffer = window.Buffer || require("buffer").Buffer;
 
 function MintToken() {
-
+    
     const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
     const [pvtKey, setPvtKey] = React.useState('');
     const [pubKey, setPubKey] = React.useState('');
     const [tokenPubKey, setTokenKey] = React.useState('');
-    const [amount, setAmount] = React.useState(0);
-
-
+    
     let fromTokenAccount: Account;
     let mint: PublicKey;
-
+    
     function pegarPvtKey() {
         //pegar valor do input
         const pvk = (document.getElementById("pvtKey") as HTMLInputElement).value;
         setPvtKey(pvk);
-        // (document.getElementById("pvtKey") as HTMLInputElement).value = "";
+        (document.getElementById("pvtKey") as HTMLInputElement).value = "";
     }
     function pegarPubkey() {
         //pegar valor do input
         const pbk = (document.getElementById("pubKey") as HTMLInputElement).value;
         setPubKey(pbk);
-        // (document.getElementById("pubKey") as HTMLInputElement).value = "";
-
+        (document.getElementById("pubKey") as HTMLInputElement).value = "";
+        
     }
-
+    
     function pegarToken() {
         //pegar valor do input
         const token = (document.getElementById("tokenKey") as HTMLInputElement).value;
         setTokenKey(token);
-        // (document.getElementById("tokenKey") as HTMLInputElement).value = "";
-
+        (document.getElementById("tokenKey") as HTMLInputElement).value = "";
+        
     }
-
-    function pegarAmount() {
-        //pegar valor do input
-        const qtd = parseInt((document.getElementById("amount") as HTMLInputElement).value);
-        //transformar em int
-        setAmount(qtd);
-    }
-
-
+    
     async function testeApi() {
-
+        
         const amount = 1000000000;
-
+        
         const pvtKeyDecoded = bs58.decode("3hy5sUta8NgU6M8K2kjSjCY48b8Wwd66rpJG2JZ1qhyPLGXt3R6cNEEZz9df666oLPJMKZnUxT5BkbVmXsDEJ3DD");
         const uInt8ArrayFromPvtKey = new Uint8Array(pvtKeyDecoded.buffer, pvtKeyDecoded.byteOffset, pvtKeyDecoded.byteLength / Uint8Array.BYTES_PER_ELEMENT);
         const fromWallet = Keypair.fromSecretKey(uInt8ArrayFromPvtKey);
@@ -91,18 +81,18 @@ function MintToken() {
             new PublicKey("3LgXWHn9ZHtv7jgUk4Ei8JF35qonMjKkhr6VhTZgy5rK")
         );
 
-        let from_a = from.address.toBase58();
-        let to_a = to.address.toBase58();
+        let from_a= from.address.toBase58();
+        let to_a= to.address.toBase58();
 
         console.log('Token Account da carteira que vai receber: ' + to.address.toBase58());
 
-        fetch("https://localhost:8080", {
+        fetch("https://localhost/8080", {
             method: "POST",
             headers: {
                 "Allow-Control-Allow-Origin": "https://localhost/8080",
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ from_a, to_a, amount }),
+            body: JSON.stringify({from_a, to_a, amount}),
 
         }).then(response => {
             console.log("Success:");
@@ -117,7 +107,6 @@ function MintToken() {
         pegarPvtKey();
         pegarPubkey();
         pegarToken();
-        pegarAmount();
     }
 
 
@@ -144,22 +133,19 @@ function MintToken() {
             mint,
             fromWallet.publicKey
         );
-
+        
         //Cada carteira que possui um token, possui um token account, a token account é "dona" do token e a carteira é "dono" da token account
         console.log(`Token Account da carteira: ${fromTokenAccount.address.toBase58()}`);
-        alert(`Token Account da carteira: ${fromTokenAccount.address.toBase58()}`);
     }
 
     async function checkBalance() {
         // get the amount of tokens in the mint
         const mintInfo = await getMint(connection, mint);
         console.log(`Quantos tokens ${mint.toBase58()} existem: ${mintInfo.supply}`);
-        alert(`Quantos tokens ${mint.toBase58()} existem: ${mintInfo.supply}`);
 
         // get the amount of tokens left in the account
         const tokenAccountInfo = await getAccount(connection, fromTokenAccount.address);
         console.log(`Quantos tokens a carteira que enviou possui: ${tokenAccountInfo.amount}`);
-        alert(`Quantos tokens a carteira que enviou possui: ${tokenAccountInfo.amount}`);
     }
 
     async function sendToken() {
@@ -169,7 +155,7 @@ function MintToken() {
         const fromWallet = Keypair.fromSecretKey(uInt8ArrayFromPvtKey);
 
         const toWallet = new PublicKey(pubKey);
-
+        
 
         // Get the token account of the toWallet address, and if it does not exist, create it
         const toTokenAccount = await getOrCreateAssociatedTokenAccount(connection, fromWallet, mint, toWallet);
@@ -183,58 +169,41 @@ function MintToken() {
             fromWallet.publicKey,
             1000000000 // 1 billion
         );
-
         console.log(`Transferência realizada com a assinatura: ${signature}`);
-        alert(`Transferência realizada com a assinatura: ${signature}`);
     }
 
 
-
+    
 
     return (
-
+        
         <div>
             <div id="barraSuperior">
                 <table id="keys">
                     <tr>
-                        <span id="area">Área do Token</span>
-                        <td>
-                        <button onClick={GetTokenAccount}>Get Token Account</button>
-                        </td>
-                        <td>
-                        <button onClick={checkBalance}>Check balance</button>
-                        </td>
-                        <button onClick={sendToken}>Send token</button>
-                        <td>
-                        <button onClick={testeApi}>Teste API</button>
-                        </td>
+                        <td>Private Key</td>
+                        <input type="text" id="pvtKey" name="pvtKey" />
+
+                        <td>Public Key</td>                    
+                        <input type="text" id="pubKey" name="pubKey" />
+                
+                        <td id="tokenButton">Token</td>        
+                        <input type="text" id="tokenKey" name="tokenKey" />
+
+                        <button id="botao" onClick={handleClick}>Enviar</button>
                     </tr>
                 </table>
             </div>
 
             <div id="token">
-                <br />
-                <div id="area">Dados</div>
-
-                <input type="text" id="pvtKey" name="pvtKey" placeholder='Private Key'/>
-                <p>Chave Privada: {pvtKey}</p>
-                {/* <button id="botao" onClick={handleClick}>Enviar</button> */}
-            
-                <input type="text" id="pubKey" name="pubKey" placeholder='Public Key' />
-                <p>Chave Pública: {pubKey}</p>
-                {/* <button id="botao" onClick={handleClick}>Enviar</button> */}
-
-                <input type="text" id="tokenKey" name="tokenKey" placeholder='Token Key' />
-                <p>Chave do Token: {tokenPubKey}</p>
-
-                <input type="text" id="amount" name="amount" placeholder='Amount' />
-                <p>Quantidade: {amount}</p>
-
-                <button id="botao" onClick={handleClick}>Enviar</button>
-
-
-                <br />
-                <br />
+                <br/>
+                <span id="area">Área do Token</span>  
+                <button onClick={GetTokenAccount}>Get Token Account</button>
+                <button onClick={checkBalance}>Check balance</button>
+                <button onClick={sendToken}>Send token</button>
+                <button onClick={testeApi}>Teste API</button>
+                <br/>
+                <br/>
             </div>
 
         </div>

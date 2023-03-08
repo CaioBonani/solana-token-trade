@@ -3,23 +3,49 @@
     height: 70px;
     width: 100%;
     position: fixed;
+    border: #000000 3px solid;
+    border-radius: 10px;
     top: 0;
     left: 0;
     z-index: 1;
 
 }
 
- #keys td {
+#barraSuperior span {
+    color: white;
+    font-size: xx-large;
+    margin-left: 10px;
+    /* margin-bottom: 100px; */
+    /* margin-top: 100px; */
+}
+
+#barraSuperior button {
+    background-color: #000000;
+    color: white;
+    padding: 10px 10px;
+    border: none;
+    cursor: pointer;
+    margin-top: 5px;
+    margin-left: 10px;
+    width: 60%;
+    box-sizing: border-box;
+}
+
+#barraSuperior button:hover {
+    background-color: #555;
+}
+
+ /* #keys td {
     width: 10%;
     padding: 10px;
     border: 2px solid black;
-    background-color: white;
-    text-align: center;
+    background-color: black;
+    text-align: start;
     color: #000000;
-}
+} */
 
 
-#keys input[type="text"] {
+/* #keys input[type="text"] {
     width: 50%;
     padding: 10px;
     margin-bottom: 10px;
@@ -27,7 +53,7 @@
     margin-left: -30%;
     border: 2px solid #000000;
     font-size: large;
-} 
+}  */
 
 #botao {
     background-color: #000000;
@@ -50,15 +76,34 @@
 
 
 #token {
-    width: 50%;
-    margin: 20px auto;
-    text-align: center;
+    width: 100%;
+    margin: auto auto;
+    /* text-align: center; */
     background-color: white;
+}
+
+#token input[type="text"] {
+    width: 50%;
+    padding: 10px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-left: auto;
+    border: 2px solid #000000;
+    font-size: large;
+}
+
+#token p {
+    font-size: large;
+    margin-bottom: 20px;
+    color: black;
+    font-weight: bold;
+    text-align: center;
 }
 
 #area {
     font-size: xx-large;
-    margin-bottom: 20px;
+    margin-bottom: 0px;
+    margin-top: 20px;
     color: black;
     font-weight: bold;
 }
@@ -71,7 +116,9 @@
     border: none;
     cursor: pointer;
     margin-top: 20px;
-    width: 70%;
+    margin-right: auto;
+    margin-left: 10px;
+    width: 50%;
     box-sizing: border-box;
 }
 
