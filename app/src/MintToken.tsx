@@ -38,36 +38,26 @@ function MintToken() {
     let mint: PublicKey;
 
     function pegarPvtKey() {
-        //pegar valor do input
         const pvk = (document.getElementById("pvtKey") as HTMLInputElement).value;
         setPvtKey(pvk);
-        // (document.getElementById("pvtKey") as HTMLInputElement).value = "";
     }
+
     function pegarPubkey() {
-        //pegar valor do input
         const pbk = (document.getElementById("pubKey") as HTMLInputElement).value;
         setPubKey(pbk);
-        // (document.getElementById("pubKey") as HTMLInputElement).value = "";
-
     }
 
     function pegarToken() {
-        //pegar valor do input
         const token = (document.getElementById("tokenKey") as HTMLInputElement).value;
         setTokenKey(token);
-        // (document.getElementById("tokenKey") as HTMLInputElement).value = "";
-
     }
 
     function pegarAmount() {
-        //pegar valor do input
         const qtd = parseInt((document.getElementById("amount") as HTMLInputElement).value);
-        //transformar em int
         setAmount(qtd);
     }
 
-
-    async function testeApi() {
+    async function testApi() {
 
         const amount = 1000000000;
 
@@ -82,7 +72,7 @@ function MintToken() {
             fromWallet.publicKey
         );
 
-        console.log('Token Account da carteira que está enviando: ' + from.address.toBase58());
+        console.log('Sending Wallet Token Account:'  + from.address.toBase58());
 
         let to = await getOrCreateAssociatedTokenAccount(
             connection,
@@ -94,7 +84,7 @@ function MintToken() {
         let from_a = from.address.toBase58();
         let to_a = to.address.toBase58();
 
-        console.log('Token Account da carteira que vai receber: ' + to.address.toBase58());
+        console.log('Receiving Wallet Token Account: ' + to.address.toBase58());
 
         fetch("https://localhost:8080", {
             method: "POST",
@@ -123,9 +113,9 @@ function MintToken() {
 
     async function GetTokenAccount() {
 
-        console.log('Chave Privada da carteira que está enviando: ' + pvtKey);
-        console.log('Chave Pública do Token: ' + tokenPubKey);
-        console.log('Chave Pública da carteira que vai receber: ' + pubKey);
+        console.log('Sender Private Key: ' + pvtKey);
+        console.log('Token Key: ' + tokenPubKey);
+        console.log('Receiver Public Key: ' + pubKey);
 
         const pvtKeyDecoded = bs58.decode(pvtKey);
         const uInt8ArrayFromPvtKey = new Uint8Array(pvtKeyDecoded.buffer, pvtKeyDecoded.byteOffset, pvtKeyDecoded.byteLength / Uint8Array.BYTES_PER_ELEMENT);
@@ -135,9 +125,8 @@ function MintToken() {
 
         mint = tokenQueSeraTransferido;
 
-        console.log('Chave Pública da carteira que está enviando: ' + fromWallet.publicKey.toBase58());
+        console.log('Sender Public Key: ' + fromWallet.publicKey.toBase58());
 
-        // Get the token account of the fromWallet address, and if it does not exist, create it
         fromTokenAccount = await getOrCreateAssociatedTokenAccount(
             connection,
             fromWallet,
@@ -145,21 +134,18 @@ function MintToken() {
             fromWallet.publicKey
         );
 
-        //Cada carteira que possui um token, possui um token account, a token account é "dona" do token e a carteira é "dono" da token account
-        console.log(`Token Account da carteira: ${fromTokenAccount.address.toBase58()}`);
-        alert(`Token Account da carteira: ${fromTokenAccount.address.toBase58()}`);
+        console.log(`Wallet Token Account: ${fromTokenAccount.address.toBase58()}`);
     }
 
     async function checkBalance() {
-        // get the amount of tokens in the mint
-        const mintInfo = await getMint(connection, mint);
-        console.log(`Quantos tokens ${mint.toBase58()} existem: ${mintInfo.supply}`);
-        alert(`Quantos tokens ${mint.toBase58()} existem: ${mintInfo.supply}`);
 
-        // get the amount of tokens left in the account
+        const mintInfo = await getMint(connection, mint);
+        console.log(`How many ${mint.toBase58()} tokens exists: ${mintInfo.supply}`);
+        alert(`How mayny ${mint.toBase58()} tokens exists: ${mintInfo.supply}`);
+
         const tokenAccountInfo = await getAccount(connection, fromTokenAccount.address);
-        console.log(`Quantos tokens a carteira que enviou possui: ${tokenAccountInfo.amount}`);
-        alert(`Quantos tokens a carteira que enviou possui: ${tokenAccountInfo.amount}`);
+        console.log(`How many tokens the sender holds: ${tokenAccountInfo.amount}`);
+        alert(`How many tokens the sender holds: ${tokenAccountInfo.amount}`);
     }
 
     async function sendToken() {
@@ -170,10 +156,10 @@ function MintToken() {
 
         const toWallet = new PublicKey(pubKey);
 
+        GetTokenAccount();
 
-        // Get the token account of the toWallet address, and if it does not exist, create it
         const toTokenAccount = await getOrCreateAssociatedTokenAccount(connection, fromWallet, mint, toWallet);
-        console.log(`Token Account da carteira que está recebendo: ${toTokenAccount.address}`);
+        console.log(`Receiver Token Account: ${toTokenAccount.address}`);
 
         const signature = await transfer(
             connection,
@@ -181,15 +167,12 @@ function MintToken() {
             fromTokenAccount.address,
             toTokenAccount.address,
             fromWallet.publicKey,
-            1000000000 // 1 billion
+            amount * 1000000000
         );
 
-        console.log(`Transferência realizada com a assinatura: ${signature}`);
-        alert(`Transferência realizada com a assinatura: ${signature}`);
+        console.log(`Transaction Signature: ${signature}`);
+        alert(`Transaction Signature: ${signature}`);
     }
-
-
-
 
     return (
 
@@ -197,7 +180,7 @@ function MintToken() {
             <div id="barraSuperior">
                 <table id="keys">
                     <tr>
-                        <span id="area">Área do Token</span>
+                        <span id="area">Token-Area</span>
                         <td>
                         <button onClick={GetTokenAccount}>Get Token Account</button>
                         </td>
@@ -206,7 +189,7 @@ function MintToken() {
                         </td>
                         <button onClick={sendToken}>Send token</button>
                         <td>
-                        <button onClick={testeApi}>Teste API</button>
+                        <button onClick={testApi}>Test API</button>
                         </td>
                     </tr>
                 </table>
@@ -214,24 +197,21 @@ function MintToken() {
 
             <div id="token">
                 <br />
-                <div id="area">Dados</div>
+                <div id="area">Data</div>
 
                 <input type="text" id="pvtKey" name="pvtKey" placeholder='Private Key'/>
-                <p>Chave Privada: {pvtKey}</p>
-                {/* <button id="botao" onClick={handleClick}>Enviar</button> */}
+                <p>Private Key: {pvtKey}</p>
             
                 <input type="text" id="pubKey" name="pubKey" placeholder='Public Key' />
-                <p>Chave Pública: {pubKey}</p>
-                {/* <button id="botao" onClick={handleClick}>Enviar</button> */}
+                <p>Public Key: {pubKey}</p>
 
                 <input type="text" id="tokenKey" name="tokenKey" placeholder='Token Key' />
-                <p>Chave do Token: {tokenPubKey}</p>
+                <p>Token: {tokenPubKey}</p>
 
                 <input type="text" id="amount" name="amount" placeholder='Amount' />
-                <p>Quantidade: {amount}</p>
+                <p>Amount: {amount}</p>
 
-                <button id="botao" onClick={handleClick}>Enviar</button>
-
+                <button id="botao" onClick={handleClick}>Save</button>
 
                 <br />
                 <br />
