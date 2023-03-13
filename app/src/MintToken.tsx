@@ -61,9 +61,11 @@ function MintToken() {
 
         const amount = 1000000000;
 
+        const private_key = '3hy5sUta8NgU6M8K2kjSjCY48b8Wwd66rpJG2JZ1qhyPLGXt3R6cNEEZz9df666oLPJMKZnUxT5BkbVmXsDEJ3DD'
         const pvtKeyDecoded = bs58.decode("3hy5sUta8NgU6M8K2kjSjCY48b8Wwd66rpJG2JZ1qhyPLGXt3R6cNEEZz9df666oLPJMKZnUxT5BkbVmXsDEJ3DD");
         const uInt8ArrayFromPvtKey = new Uint8Array(pvtKeyDecoded.buffer, pvtKeyDecoded.byteOffset, pvtKeyDecoded.byteLength / Uint8Array.BYTES_PER_ELEMENT);
         const fromWallet = Keypair.fromSecretKey(uInt8ArrayFromPvtKey);
+
 
         let from = await getOrCreateAssociatedTokenAccount(
             connection,
@@ -81,9 +83,10 @@ function MintToken() {
             new PublicKey("3LgXWHn9ZHtv7jgUk4Ei8JF35qonMjKkhr6VhTZgy5rK")
         );
 
-        let from_a = from.address.toBase58();
-        let to_a = to.address.toBase58();
+        let sender = from.address.toBase58();
+        let receiver = to.address.toBase58();
 
+        console.log('Sender Wallet Token Account: ' + from.address.toBase58());
         console.log('Receiving Wallet Token Account: ' + to.address.toBase58());
 
         fetch("https://localhost:8080", {
@@ -92,7 +95,7 @@ function MintToken() {
                 "Allow-Control-Allow-Origin": "https://localhost/8080",
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ from_a, to_a, amount }),
+            body: JSON.stringify({ private_key, sender, receiver, from, amount }),
 
         }).then(response => {
             console.log("Success:");
