@@ -3,7 +3,8 @@ import {
     Connection,
     PublicKey,
     Keypair,
-    LAMPORTS_PER_SOL
+    LAMPORTS_PER_SOL,
+    GetProgramAccountsFilter,
 } from '@solana/web3.js';
 
 import {
@@ -14,7 +15,8 @@ import {
     Account,
     getMint,
     getAccount,
-    createAssociatedTokenAccount
+    createAssociatedTokenAccount,
+    TOKEN_PROGRAM_ID
 } from '@solana/spl-token';
 
 import bs58 from 'bs58';
@@ -32,6 +34,7 @@ function MintToken() {
     const [pubKey, setPubKey] = React.useState('');
     const [tokenPubKey, setTokenKey] = React.useState('');
     const [amount, setAmount] = React.useState(0);
+    const [tokens, setTokens] = React.useState('');
 
 
     let fromTokenAccount: Account;
@@ -56,6 +59,7 @@ function MintToken() {
         const qtd = parseInt((document.getElementById("amount") as HTMLInputElement).value);
         setAmount(qtd);
     }
+
 
     async function testApi() {
 
@@ -94,8 +98,9 @@ function MintToken() {
             headers: {
                 "Allow-Control-Allow-Origin": "https://localhost/8080",
                 "Content-Type": "application/json",
+                "Allow-Control-Allow-Methods": "POST",
             },
-            body: JSON.stringify({ private_key, sender, receiver, from, amount }),
+            body: JSON.stringify({ private_key, sender, receiver, amount }),
 
         }).then(response => {
             console.log("Success:");
@@ -177,22 +182,99 @@ function MintToken() {
         alert(`Transaction Signature: ${signature}`);
     }
 
+    async function getAllTokensFromAccount() {
+
+        const consoleLogElement = document.getElementById("console-log");
+        console.log("Getting all tokens from account");
+        
+        
+        // const pub = new PublicKey("9avcSjtvuf74i8iu8EoLnEdaxsfkCfUxW23kkewsFZhd");
+        const pub = "9avcSjtvuf74i8iu8EoLnEdaxsfkCfUxW23kkewsFZhd"
+        
+        const filters:GetProgramAccountsFilter[] = [
+            {
+                dataSize: 165,    //size of account (bytes)
+            },
+            {
+                memcmp: {
+                offset: 32,     //location of our query in the account (bytes)
+                bytes: pub,  //our search criteria, a base58 encoded string
+            },            
+        }];
+        const accounts = await connection.getParsedProgramAccounts(
+            TOKEN_PROGRAM_ID, //new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
+            {filters: filters}
+            );
+            console.log(`Found ${accounts.length} token account(s) for wallet ${pub}.`);
+            let string = '';
+
+            accounts.forEach((account, i) => {
+                //Parse the account data
+                const parsedAccountInfo:any = account.account.data;
+                const mintAddress:string = parsedAccountInfo["parsed"]["info"]["mint"];
+                const tokenBalance: number = parsedAccountInfo["parsed"]["info"]["tokenAmount"]["uiAmount"];
+                //Log results
+
+                string: string = string + 'Token mint: ' + mintAddress + ' - Token Balance: ' + tokenBalance + '\n' + '\n';
+                // console.log(`Token Account No. ${i + 1}: ${account.pubkey.toString()}`);
+                // console.log(`--Token Mint: ${mintAddress}`);
+                // console.log(`--Token Balance: ${tokenBalance}`);
+
+                console.log(string);
+
+                const teste = 'alo\nalo'
+                
+                setTokens(string);
+            });
+    }
+
+    // async function getAllTokensFromAccount() {
+
+    //     // const pvtKeyDecoded = bs58.decode(pvtKey);
+    //     // const uInt8ArrayFromPvtKey = new Uint8Array(pvtKeyDecoded.buffer, pvtKeyDecoded.byteOffset, pvtKeyDecoded.byteLength / Uint8Array.BYTES_PER_ELEMENT);
+    //     // const fromWallet = Keypair.fromSecretKey(uInt8ArrayFromPvtKey);
+
+    //     //tirar a gambiarra dps
+
+    //     const pub = new PublicKey("9avcSjtvuf74i8iu8EoLnEdaxsfkCfUxW23kkewsFZhd");
+    //     const tokenAccounts = await connection.getTokenAccountsByOwner(pub, { programId: TOKEN_PROGRAM_ID });
+        
+    //     //parse the content
+
+        
+
+    //     // setTokens(tokenAccounts)
+        
+    //     console.log(tokenAccounts);
+    //     alert(tokenAccounts);
+
+    // }
+
     return (
 
-        <div>
+        <div id="pai">
             <div id="barraSuperior">
                 <table id="keys">
                     <tr>
                         <span id="area">Token-Area</span>
                         <td>
-                        <button onClick={GetTokenAccount}>Get Token Account</button>
+                            <button onClick={GetTokenAccount}>Get Token Account</button>
                         </td>
+
                         <td>
-                        <button onClick={checkBalance}>Check balance</button>
+                            <button onClick={checkBalance}>Check balance</button>
                         </td>
-                        <button onClick={sendToken}>Send token</button>
+
                         <td>
-                        <button onClick={testApi}>Test API</button>
+                            <button onClick={sendToken}>Send token</button>
+                        </td>
+
+                        <td>
+                            <button onClick={testApi}>Test API</button>
+                        </td>
+
+                        <td>
+                            <button onClick={getAllTokensFromAccount}>Get All Tokens From Account</button>
                         </td>
                     </tr>
                 </table>
@@ -216,8 +298,20 @@ function MintToken() {
 
                 <button id="botao" onClick={handleClick}>Save</button>
 
-                <br />
-                <br />
+
+                <div id="wallet">
+                    <h1>Wallet</h1>
+
+                    <span> Tokens: </span>
+
+                    <div id="console-log" style={{whiteSpace: 'pre-line'}}>
+                        {tokens}
+                    </div>
+                </div>
+
+                {/* <br />
+                <br /> */}
+
             </div>
 
         </div>

@@ -1,4 +1,11 @@
+#pai {
+    width: 100%;
+}
+
 #barraSuperior {
+
+    float: left;
+
     background-color: #4CAF50;
     height: 70px;
     width: 100%;
@@ -76,8 +83,11 @@
 
 
 #token {
-    width: 100%;
-    margin: auto auto;
+    width: 25%;
+    height: 700px;
+    margin-top: 60px;
+    margin-left: 200px;
+    /* margin: auto auto; */
     /* text-align: center; */
     background-color: white;
 }
@@ -126,3 +136,33 @@
     background-color: #105714;
 }
 
+/*  colocar esta div com um retangulo a direita*/
+#wallet {
+    position: relative;
+    float: right;
+    width: 210%;
+    /* margin-left:300px; */
+    right: -880px;
+    height: 600px;
+    bottom: 600px;
+
+    box-sizing: border-box;
+    /* margin-bottom: 1000px;*/
+    /* text-align: center; */
+    background-color: white;
+}
+
+#wallet h1 {
+    color: black;
+}
+
+#wallet span {
+    color: black;
+    font-size: large;
+    font-weight: bold;
+}
+
+#console-log {
+
+    color: black;
+}

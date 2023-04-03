@@ -4,12 +4,18 @@ use anchor_lang::error_code;
 use anchor_lang::solana_program::system_instruction::transfer;
 use anchor_lang::solana_program::program::invoke;
 
-declare_id!("5ugjDFNtj6UmuP1BCd4kGKFPHJowUWtktxdp8yXxRxf5");
+declare_id!("77YftNAbstL1U5chXww6A2ztiek4DLwrF5KEW5FjpX6V");
 
 #[program]
 pub mod contract {
 
     use super::*;
+
+    pub fn store_data() -> Result<()> {
+        let account = &mut ctx.accounts.data;
+        account.data = data;
+        Ok(())
+    }
 
     // pub fn transfer_sol(ctx: Context<TransferSOL>) -> Result<()> {
     //     let qtd: u64 = 1;
