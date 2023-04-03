@@ -81,7 +81,6 @@
     font-size: larger;
 }
 
-
 #token {
     width: 25%;
     height: 700px;
@@ -93,6 +92,16 @@
 }
 
 #token input[type="text"] {
+    width: 50%;
+    padding: 10px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-left: auto;
+    border: 2px solid #000000;
+    font-size: large;
+}
+
+#token input[type="password"] {
     width: 50%;
     padding: 10px;
     margin-bottom: 10px;

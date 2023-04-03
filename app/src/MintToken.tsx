@@ -42,7 +42,8 @@ function MintToken() {
 
     function pegarPvtKey() {
         const pvk = (document.getElementById("pvtKey") as HTMLInputElement).value;
-        setPvtKey(pvk);
+        const pvt_hidden = pvk.replace(pvk, "**********");
+        setPvtKey(pvt_hidden);
     }
 
     function pegarPubkey() {
@@ -57,6 +58,8 @@ function MintToken() {
 
     function pegarAmount() {
         const qtd = parseInt((document.getElementById("amount") as HTMLInputElement).value);
+
+        //if qtd is not a integer return -1 and alert an error
         setAmount(qtd);
     }
 
@@ -284,7 +287,7 @@ function MintToken() {
                 <br />
                 <div id="area">Data</div>
 
-                <input type="text" id="pvtKey" name="pvtKey" placeholder='Private Key'/>
+                <input type="password" id="pvtKey" name="pvtKey" placeholder='Private Key'/>
                 <p>Private Key: {pvtKey}</p>
             
                 <input type="text" id="pubKey" name="pubKey" placeholder='Public Key' />
